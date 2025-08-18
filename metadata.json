@@ -1,0 +1,5 @@
+{
+  "name": "Image Copyright Assistant",
+  "description": "An app to analyze images for copyright and policy compliance using AI.",
+  "requestFramePermissions": []
+}
