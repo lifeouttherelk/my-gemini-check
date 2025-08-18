@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="index.css">
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script type="importmap">
 {
   "imports": {
@@ -18,10 +19,33 @@
   }
 }
 </script>
-<link rel="stylesheet" href="index.css">
 </head>
 <body>
   <div id="root"></div>
-  <script type="module" src="index.tsx"></script>
+  <script type="module">
+    (async () => {
+      try {
+        const response = await fetch('index.tsx');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch index.tsx: ${response.statusText}`);
+        }
+        const tsxCode = await response.text();
+        const jsCode = Babel.transform(tsxCode, {
+          presets: ['react', 'typescript'],
+          filename: 'index.tsx' // For better error messages
+        }).code;
+        
+        const blob = new Blob([jsCode], { type: 'application/javascript' });
+        const url = URL.createObjectURL(blob);
+        await import(url);
+      } catch (error) {
+        console.error('Error loading application:', error);
+        const root = document.getElementById('root');
+        if (root) {
+            root.innerHTML = `<div style="font-family: sans-serif; padding: 2rem; color: #991b1b; background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 0.5rem;"><strong>Error:</strong> Could not load application. ${error.message}</div>`;
+        }
+      }
+    })();
+  </script>
 </body>
 </html>
